@@ -3,32 +3,66 @@ package com.flowergarden.bouquet;
 import com.flowergarden.flowers.*;
 import com.flowergarden.properties.FreshnessInteger;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.lang.reflect.Field;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 
 /**
  * @author Andrew Bandura
  */
+
+@RunWith(MockitoJUnitRunner.class)
 public class MarriedBouquetTest {
 
     private MarriedBouquet marriedBouquet;
-    private GeneralFlower rose;
+    @Mock
+    private FreshnessInteger mockedFreshnessInteger1;
+    @Mock
+    private FreshnessInteger mockedFreshnessInteger2;
+    @Mock
+    private FreshnessInteger mockedFreshnessInteger3;
+    @Mock
+    private GeneralFlower mockedRose;
+    @Mock
+    private GeneralFlower mockedChamomile1;
+    @Mock
+    private GeneralFlower mockedChamomile2;
 
     @Before
     public void setUp() {
 
-        rose = new Rose(true,50,10, new FreshnessInteger(1));
+        when(mockedFreshnessInteger1.getFreshness()).thenReturn(1);
+        when(mockedFreshnessInteger2.getFreshness()).thenReturn(2);
+        when(mockedFreshnessInteger3.getFreshness()).thenReturn(3);
+
+        when(mockedRose.getLenght()).thenReturn(30);
+        when(mockedRose.getPrice()).thenReturn(10f);
+        when(mockedRose.getFreshness()).thenReturn(mockedFreshnessInteger1);
+        when(mockedRose.compareTo(any(GeneralFlower.class))).thenCallRealMethod();
+
+        when(mockedChamomile1.getLenght()).thenReturn(10);
+        when(mockedChamomile1.getPrice()).thenReturn(7f);
+        when(mockedChamomile1.getFreshness()).thenReturn(mockedFreshnessInteger3);
+
+        when(mockedChamomile2.getLenght()).thenReturn(12);
+        when(mockedChamomile2.getPrice()).thenReturn(7f);
+        when(mockedChamomile2.getFreshness()).thenReturn(mockedFreshnessInteger2);
+        when(mockedChamomile2.compareTo(any(GeneralFlower.class))).thenCallRealMethod();
 
         marriedBouquet = new MarriedBouquet();
-        marriedBouquet.addFlower(new Chamomile(50,10, 7, new FreshnessInteger(2)));
-        marriedBouquet.addFlower(new Chamomile(40,12, 7, new FreshnessInteger(2)));
-        marriedBouquet.addFlower(rose);
+        marriedBouquet.addFlower(mockedChamomile1);
+        marriedBouquet.addFlower(mockedRose);
+        marriedBouquet.addFlower(mockedChamomile2);
+
     }
 
     @Test
@@ -36,35 +70,44 @@ public class MarriedBouquetTest {
 
         float actual = marriedBouquet.getPrice();
         float expected = 144;
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
     }
 
     @Test
     public void addFlower(){
 
         int expected = marriedBouquet.getFlowers().size() + 1;
-        marriedBouquet.addFlower(new Rose(true,50,10, new FreshnessInteger(1)));
+        marriedBouquet.addFlower(mockedRose);
         int actual = marriedBouquet.getFlowers().size();
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
 
     }
 
     @Test
     public void searchFlowersByLenght() {
 
-        int expected = 2;
+        int expected = 3;
         int actual = marriedBouquet.searchFlowersByLenght(10,30).size();
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void searchFlowersByIncorrectLenghtIntervalShouldReturnZero() {
+
+        int expected = 0;
+        int actual = marriedBouquet.searchFlowersByLenght(30,10).size();
+        assertEquals(expected, actual);
     }
 
     @Test
     public void sortByFreshness() {
 
-        GeneralFlower expected = rose;
         marriedBouquet.sortByFreshness();
-        GeneralFlower actual = (GeneralFlower) marriedBouquet.getFlowers().toArray()[0];
+        List<GeneralFlower> actual = (List<GeneralFlower>) marriedBouquet.getFlowers();
+        List<GeneralFlower> expected = Arrays.asList(mockedRose, mockedChamomile2, mockedChamomile1);
 
-        assertEquals(actual, expected);
+       assertEquals(expected, actual);
+
     }
 
     @Test
@@ -73,7 +116,7 @@ public class MarriedBouquetTest {
         int expected = 3;
         int actual = marriedBouquet.getFlowers().size();
 
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
 
     }
 
@@ -86,6 +129,6 @@ public class MarriedBouquetTest {
         field.setAccessible(true);
         float actual = field.getFloat(marriedBouquet);
 
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
     }
 }
