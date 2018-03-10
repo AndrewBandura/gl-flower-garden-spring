@@ -13,8 +13,19 @@ import com.flowergarden.flowers.Rose;
 
 public class MarriedBouquet implements Bouquet<GeneralFlower> {
 
+	private int id;
 	private float assemblePrice = 120;
 	private List<GeneralFlower> flowerList = new ArrayList<>();
+
+	@Override
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	@Override
+	public void setAssemblePrice(float assemblePrice) {
+		this.assemblePrice = assemblePrice;
+	}
 
 	@Override
 	public float getPrice() {
