@@ -3,9 +3,15 @@ package com.flowergarden.flowers;
 import javax.xml.bind.annotation.XmlElement;
 
 import com.flowergarden.properties.FreshnessInteger;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class GeneralFlower implements Flower<Integer>, Comparable<GeneralFlower> {
-	
+
+	int id;
+
 	FreshnessInteger freshness;
 	
 	@XmlElement

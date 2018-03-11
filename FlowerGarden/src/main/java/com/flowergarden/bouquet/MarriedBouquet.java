@@ -1,20 +1,22 @@
 package com.flowergarden.bouquet;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.flowergarden.flowers.Chamomile;
+import com.flowergarden.flowers.Flower;
 import com.flowergarden.flowers.GeneralFlower;
-import com.flowergarden.flowers.Rose;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+
+@Data
 public class MarriedBouquet implements Bouquet<GeneralFlower> {
 
 	private int id;
-	private float assemblePrice = 120;
+	private float assemblePrice;
 	private List<GeneralFlower> flowerList = new ArrayList<>();
 
 	@Override
@@ -23,9 +25,15 @@ public class MarriedBouquet implements Bouquet<GeneralFlower> {
 	}
 
 	@Override
-	public void setAssemblePrice(float assemblePrice) {
-		this.assemblePrice = assemblePrice;
+	public float getAssembledPrice() {
+		return this.assemblePrice;
 	}
+
+
+	public void setAssembledPrice(float price) {
+		assemblePrice = price;
+	}
+
 
 	@Override
 	public float getPrice() {
@@ -62,7 +70,10 @@ public class MarriedBouquet implements Bouquet<GeneralFlower> {
 		return flowerList;
 	}
 
-	public void setAssembledPrice(float price) {
-		assemblePrice = price;
+	@Override
+	public void setFlowers(Collection<Flower> flowers) {
+
+		this.flowerList = (ArrayList)flowers;
+
 	}
 }

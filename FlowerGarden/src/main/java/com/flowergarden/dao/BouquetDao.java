@@ -9,10 +9,10 @@ import java.util.List;
  */
 public interface BouquetDao {
 
-    int create(Bouquet bouquet);
+    int add(Bouquet bouquet);
     Bouquet read(int id);
     boolean update(Bouquet bouquet);
-    boolean delete(Bouquet bouquet);
+    boolean delete(int id);
     List<Bouquet> findAll();
 
 }
