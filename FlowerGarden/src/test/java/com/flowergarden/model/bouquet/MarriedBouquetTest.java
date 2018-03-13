@@ -1,6 +1,6 @@
-package com.flowergarden.bouquet;
+package com.flowergarden.model.bouquet;
 
-import com.flowergarden.flowers.*;
+import com.flowergarden.model.flowers.GeneralFlower;
 import com.flowergarden.properties.FreshnessInteger;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,6 +59,7 @@ public class MarriedBouquetTest {
         when(mockedChamomile2.compareTo(any(GeneralFlower.class))).thenCallRealMethod();
 
         marriedBouquet = new MarriedBouquet();
+        marriedBouquet.setAssembledPrice(120f);
         marriedBouquet.addFlower(mockedChamomile1);
         marriedBouquet.addFlower(mockedRose);
         marriedBouquet.addFlower(mockedChamomile2);

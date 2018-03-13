@@ -1,78 +1,87 @@
 package com.flowergarden.dto;
 
-import com.flowergarden.bouquet.Bouquet;
-import com.flowergarden.bouquet.MarriedBouquet;
-import com.flowergarden.dto.BouquetDto;
-import com.flowergarden.dto.FlowerDto;
-import com.flowergarden.flowers.*;
+import com.flowergarden.model.bouquet.Bouquet;
+import com.flowergarden.model.bouquet.MarriedBouquet;
+import com.flowergarden.model.flowers.Chamomile;
+import com.flowergarden.model.flowers.GeneralFlower;
+import com.flowergarden.model.flowers.Rose;
+import com.flowergarden.model.flowers.Tulip;
 import com.flowergarden.properties.FreshnessInteger;
+import com.flowergarden.util.Property;
+
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * @author Andrew Bandura
  */
 public class DtoMapper {
 
-    public static  Bouquet getPojo(BouquetDto dto) {
+    private static Properties properties = (new Property()).getProperties();
 
-        String name = dto.getName();
+    public static Optional<Bouquet> getPojo(BouquetDto dto) {
 
-            if(name.equals("married")){
+        String className = properties.getProperty(dto.getName());
+        Class clazz;
 
-                Bouquet bouquet = new MarriedBouquet();
-                bouquet.setId(dto.getId());
-                bouquet.setAssemblePrice(dto.getAssemblePrice());
+        try {
+            clazz = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
 
-                return bouquet;
+        Bouquet bouquet;
+        try {
+            bouquet = (Bouquet) clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+        bouquet.setId(dto.getId());
+        bouquet.setAssemblePrice(dto.getAssemblePrice());
 
-            }
-            else{
+        return Optional.of(bouquet);
 
-                return null;
-            }
     }
 
-    public static GeneralFlower getPojo(FlowerDto dto) {
+    public static Optional<GeneralFlower> getPojo(FlowerDto dto) {
 
-        String name = dto.getName();
+        String className = properties.getProperty(dto.getName());
+        Class clazz;
 
-        if(name.equals("rose")){
-
-            Rose flower = new Rose();
-            flower.setSpike(dto.isSpike());
-
-            flower.setId(dto.getId());
-            flower.setLenght(dto.getLenght());
-            flower.setPrice(dto.getPrice());
-            flower.setFreshness(new FreshnessInteger(dto.getFreshness()));
-
-            return flower;
-
+        try {
+            clazz = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return Optional.empty();
         }
-        else if(name.equals("chamomile")){
 
-            Chamomile flower = new Chamomile();
-            flower.setPetals(dto.getPetals());
-
-            flower.setId(dto.getId());
-            flower.setLenght(dto.getLenght());
-            flower.setPrice(dto.getPrice());
-            flower.setFreshness(new FreshnessInteger(dto.getFreshness()));
-
-            return flower;
-
+        GeneralFlower flower;
+        try {
+            flower = (GeneralFlower) clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            return Optional.empty();
         }
-        else if(name.equals("tulip")){
-            Tulip flower = new Tulip();
 
-            flower.setId(dto.getId());
-            flower.setLenght(dto.getLenght());
-            flower.setPrice(dto.getPrice());
-            flower.setFreshness(new FreshnessInteger(dto.getFreshness()));
+        flower.setId(dto.getId());
+        flower.setLenght(dto.getLenght());
+        flower.setPrice(dto.getPrice());
+        flower.setFreshness(new FreshnessInteger(dto.getFreshness()));
 
-            return flower;
-        }
-        else{
-            return null;
+        if (flower instanceof Rose) {
+            ((Rose) flower).setSpike(dto.isSpike());
+            return Optional.of(flower);
+        } else if (flower instanceof Chamomile) {
+            ((Chamomile) flower).setPetals(dto.getPetals());
+            return Optional.of(flower);
+        } else if (flower instanceof Tulip) {
+            return Optional.of(flower);
+        } else {
+
+            return Optional.empty();
+
         }
 
     }

@@ -1,7 +1,5 @@
 package com.flowergarden.dto;
 
-
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -13,7 +13,7 @@ import java.util.Properties;
  */
 public class ConnectionFactory {
 
-    private static String url;
+    private String url;
     private String mode;
 
     public ConnectionFactory(String mode) {
@@ -21,20 +21,21 @@ public class ConnectionFactory {
         this.url = getUrl(this.mode);
     }
 
-    private static String getUrl(String mode) {
+    private String getUrl(String mode) {
 
-        String dbPath = "";
+        String dbPath;
         Properties prop = new Property().getProperties();
 
-        if(mode == "prod")
+        if ("prod".equals(mode))
             dbPath = prop.getProperty("db");
-        else if(mode=="test")
+        else if ("test".equals(mode))
             dbPath = prop.getProperty("db_test");
+        else return "";
 
         File file = new File(dbPath);
 
         try {
-            return "jdbc:sqlite:"+file.getCanonicalFile().toURI();
+            return "jdbc:sqlite:" + file.getCanonicalFile().toURI();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -42,8 +43,7 @@ public class ConnectionFactory {
         return "";
     }
 
-    public static Connection getConnection()
-    {
+    public Connection getConnection() {
         try {
             return DriverManager.getConnection(url);
         } catch (SQLException ex) {
