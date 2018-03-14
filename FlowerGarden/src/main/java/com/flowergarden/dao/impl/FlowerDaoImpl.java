@@ -37,7 +37,8 @@ public class FlowerDaoImpl implements FlowerDao {
             stmt.setObject(3, flower.getFreshness());
             stmt.setObject(4, flower.getPrice());
             Bouquet bouquet = flower.getBouquet();
-            if (!(bouquet == null)) {
+
+            if(!(bouquet==null)){
                 stmt.setObject(7, bouquet.getId());
             }
 
@@ -123,8 +124,9 @@ public class FlowerDaoImpl implements FlowerDao {
             statement.setObject(2, flower.getLenght());
             statement.setObject(3, flower.getFreshness());
             statement.setObject(4, flower.getPrice());
+
             Bouquet bouquet = flower.getBouquet();
-            if (!(bouquet == null)) {
+            if(!(bouquet==null)){
                 statement.setObject(7, bouquet.getId());
             }
             statement.setObject(8, flower.getId());

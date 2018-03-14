@@ -71,7 +71,6 @@ public class DtoMapper {
         flower.setPrice(dto.getPrice());
         flower.setFreshness(new FreshnessInteger(dto.getFreshness()));
 
-
         if (flower instanceof Rose) {
             ((Rose) flower).setSpike(dto.isSpike());
             return Optional.of(flower);
