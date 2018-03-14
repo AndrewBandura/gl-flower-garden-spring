@@ -3,6 +3,7 @@ package com.flowergarden.dao.impl;
 import com.flowergarden.dao.FlowerDao;
 import com.flowergarden.dto.DtoMapper;
 import com.flowergarden.dto.FlowerDto;
+import com.flowergarden.model.bouquet.Bouquet;
 import com.flowergarden.model.flowers.Chamomile;
 import com.flowergarden.model.flowers.GeneralFlower;
 import com.flowergarden.model.flowers.Rose;
@@ -35,7 +36,10 @@ public class FlowerDaoImpl implements FlowerDao {
             stmt.setObject(2, flower.getLenght());
             stmt.setObject(3, flower.getFreshness());
             stmt.setObject(4, flower.getPrice());
-            stmt.setObject(7, flower.getBouquet_id());
+            Bouquet bouquet = flower.getBouquet();
+            if (!(bouquet == null)) {
+                stmt.setObject(7, bouquet.getId());
+            }
 
             if (flower instanceof Rose) {
                 stmt.setObject(5, null);
@@ -120,7 +124,10 @@ public class FlowerDaoImpl implements FlowerDao {
             statement.setObject(2, flower.getLenght());
             statement.setObject(3, flower.getFreshness());
             statement.setObject(4, flower.getPrice());
-            statement.setObject(7, flower.getBouquet_id());
+            Bouquet bouquet = flower.getBouquet();
+            if (!(bouquet == null)) {
+                statement.setObject(7, bouquet.getId());
+            }
             statement.setObject(8, flower.getId());
 
             if (flower instanceof Rose) {

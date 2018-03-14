@@ -28,7 +28,7 @@ public class BouquetDaoImplTest {
     private static BouquetDao bouquetDao;
     private static FlowerDao flowerDao;
 
-    private int firstBouquetId;
+    private Bouquet bouquetTest;
 
     @BeforeClass
     public static void classSetUp(){
@@ -40,25 +40,23 @@ public class BouquetDaoImplTest {
     @Before
     public void setUp(){
 
-        Bouquet bouquet = new MarriedBouquet();
-        bouquet.setAssemblePrice(100);
-        int id = bouquetDao.add(bouquet);
-
-        firstBouquetId = id;
+        bouquetTest = new MarriedBouquet();
+        bouquetTest.setAssemblePrice(100);
+        int id = bouquetDao.add(bouquetTest);
 
         GeneralFlower flowerRose = new Rose();
         flowerRose.setPrice(50);
         flowerRose.setFreshness(new FreshnessInteger(1));
         flowerRose.setLenght(70);
         ((Rose)flowerRose).setSpike(true);
-        flowerRose.setBouquet_id(id);
+        flowerRose.setBouquet(bouquetTest);
         flowerDao.add(flowerRose);
 
         GeneralFlower flowerChamomile = new Chamomile();
         flowerChamomile.setPrice(40);
         flowerChamomile.setFreshness(new FreshnessInteger(2));
         flowerChamomile.setLenght(50);
-        flowerChamomile.setBouquet_id(id);
+        flowerChamomile.setBouquet(bouquetTest);
         ((Chamomile)flowerChamomile).setPetals(95);
         flowerDao.add(flowerChamomile);
 
@@ -66,7 +64,7 @@ public class BouquetDaoImplTest {
         flowerTulip.setPrice(30);
         flowerTulip.setFreshness(new FreshnessInteger(3));
         flowerTulip.setLenght(45);
-        flowerTulip.setBouquet_id(id);
+        flowerTulip.setBouquet(bouquetTest);
         flowerDao.add(flowerTulip);
     }
 
@@ -200,7 +198,7 @@ public class BouquetDaoImplTest {
 
         Optional<Bouquet> bouquet;
 
-        bouquet = bouquetDao.read(firstBouquetId, FetchMode.EAGER);
+        bouquet = bouquetDao.read(bouquetTest.getId(), FetchMode.EAGER);
 
         if (bouquet.isPresent()) {
             actual = bouquet.get().getPrice();

@@ -2,6 +2,7 @@ package com.flowergarden.model.flowers;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import com.flowergarden.model.bouquet.Bouquet;
 import com.flowergarden.properties.FreshnessInteger;
 
 import lombok.Getter;
@@ -23,7 +24,7 @@ public class GeneralFlower implements Flower<Integer>, Comparable<GeneralFlower>
     @XmlElement
     int lenght;
 
-    int bouquet_id;
+    Bouquet bouquet;
 
     public void setFreshness(FreshnessInteger fr) {
         freshness = fr;
