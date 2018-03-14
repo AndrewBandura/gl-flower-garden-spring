@@ -4,11 +4,10 @@ import com.flowergarden.dao.impl.FlowerDaoImpl;
 import com.flowergarden.model.flowers.GeneralFlower;
 import com.flowergarden.model.flowers.Rose;
 import com.flowergarden.util.ConnectionFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,12 +21,22 @@ import static org.junit.Assert.assertTrue;
  */
 public class FlowerDaoImplTest {
 
+    private static Connection connection;
     private static FlowerDao flowerDao;
 
     @BeforeClass
     public static void classSetUp(){
+        connection = ConnectionFactory.getConnection("test");
+        flowerDao = new FlowerDaoImpl(connection);
+    }
 
-        flowerDao = new FlowerDaoImpl(ConnectionFactory.getConnection("test"));
+    @AfterClass
+    public static void classTearDown(){
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Before
