@@ -147,13 +147,13 @@ public class FlowerDaoImpl implements FlowerDao {
     }
 
     @Override
-    public boolean delete(int id) {
+    public boolean delete(GeneralFlower flower) {
 
         boolean deleted = false;
 
         try {
             PreparedStatement statement = connection.prepareStatement(SQL_DELETE);
-            statement.setObject(1, id);
+            statement.setObject(1, flower.getId());
             deleted = statement.execute();
 
         } catch (SQLException e) {

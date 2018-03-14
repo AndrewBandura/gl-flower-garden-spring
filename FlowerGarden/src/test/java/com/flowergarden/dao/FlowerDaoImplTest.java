@@ -97,7 +97,7 @@ public class FlowerDaoImplTest {
 
         GeneralFlower flower = new Rose();
         int id = flowerDao.add(flower);
-        flowerDao.delete(id);
+        flowerDao.delete(flower);
 
         assertFalse(flowerDao.read(id).isPresent());
 

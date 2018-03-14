@@ -1,5 +1,6 @@
 package com.flowergarden.dto;
 
+import com.flowergarden.model.bouquet.Bouquet;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,5 +19,6 @@ public class FlowerDto {
     private float price;
     private int petals;
     private boolean spike;
+    private int bouquet_id;
 
 }

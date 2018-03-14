@@ -37,7 +37,7 @@ public interface FlowerDao {
 
     boolean update(GeneralFlower flower);
 
-    boolean delete(int id);
+    boolean delete(GeneralFlower flower);
 
     boolean deleteAll();
 

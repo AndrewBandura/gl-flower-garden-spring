@@ -23,7 +23,7 @@ public class BouquetDaoImpl implements BouquetDao {
 
     public BouquetDaoImpl(Connection connection) {
         this.connection = connection;
-        flowerDao = new FlowerDaoImpl(connection);
+        this.flowerDao = new FlowerDaoImpl(connection);
     }
 
     @Override
@@ -31,7 +31,9 @@ public class BouquetDaoImpl implements BouquetDao {
 
         int newId = 0;
 
-        try  {
+        try {
+            connection.setAutoCommit(false);
+
             PreparedStatement statement = connection.prepareStatement(SQL_ADD);
             statement.setObject(1, bouquet.getName());
             statement.setObject(2, bouquet.getAssemblePrice());
@@ -46,6 +48,25 @@ public class BouquetDaoImpl implements BouquetDao {
                 }
             }
 
+            Collection<GeneralFlower> flowers = bouquet.getFlowers();
+            for (GeneralFlower flower : flowers) {
+                flower.setBouquet(bouquet);
+                flowerDao.add(flower);
+            }
+
+            connection.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        try {
+            connection.setAutoCommit(true);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -58,7 +79,7 @@ public class BouquetDaoImpl implements BouquetDao {
 
         boolean updated = false;
 
-        try  {
+        try {
             PreparedStatement statement = connection.prepareStatement(SQL_UPDATE);
             statement.setObject(1, bouquet.getName());
             statement.setObject(2, bouquet.getAssemblePrice());
@@ -79,7 +100,7 @@ public class BouquetDaoImpl implements BouquetDao {
 
         String query = fetchMode == FetchMode.EAGER ? SQL_READ_EAGER : SQL_READ_LAZY;
 
-        try  {
+        try {
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setObject(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -98,7 +119,7 @@ public class BouquetDaoImpl implements BouquetDao {
 
         Optional<Bouquet> bouquet = Optional.empty();
 
-        try  {
+        try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL_READ_FIRST);
 
@@ -112,17 +133,38 @@ public class BouquetDaoImpl implements BouquetDao {
     }
 
     @Override
-    public boolean delete(int id) {
+    public boolean delete(Bouquet bouquet) {
 
         boolean deleted = false;
 
         try {
+            connection.setAutoCommit(false);
+
             PreparedStatement statement = connection.prepareStatement(SQL_DELETE);
-            statement.setObject(1, id);
+            statement.setObject(1, bouquet.getId());
             deleted = statement.execute();
+
+            Collection<GeneralFlower> flowers = bouquet.getFlowers();
+            for (GeneralFlower flower : flowers) {
+                flower.setBouquet(null);
+                flowerDao.update(flower);
+            }
+
+            connection.commit();
 
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e2) {
+                e2.printStackTrace();
+            }
         }
 
         return deleted;
@@ -163,7 +205,7 @@ public class BouquetDaoImpl implements BouquetDao {
                 if (bouquet == null) {
                     BouquetDto dto = getBouquetDto(rs);
                     Optional<Bouquet> bouquetOpt = DtoMapper.getPojo(dto);
-                    if(bouquetOpt.isPresent()){
+                    if (bouquetOpt.isPresent()) {
                         bouquet = bouquetOpt.get();
                         bouquets.put(bouquetId, bouquet);
                     }
@@ -219,7 +261,7 @@ public class BouquetDaoImpl implements BouquetDao {
                 if (isFlowerRecordPresent) {
                     FlowerDto flowerDto = flowerDao.getFlowerDto(rs);
                     Optional<GeneralFlower> flowerOpt = DtoMapper.getPojo(flowerDto);
-                    if (bouquet.isPresent()  && flowerOpt.isPresent()) {
+                    if (bouquet.isPresent() && flowerOpt.isPresent()) {
                         GeneralFlower flower = flowerOpt.get();
                         bouquet.get().addFlower(flower);
                     }

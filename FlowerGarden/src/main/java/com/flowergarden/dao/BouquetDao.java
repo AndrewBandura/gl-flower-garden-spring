@@ -40,7 +40,7 @@ public interface BouquetDao {
 
     boolean update(Bouquet bouquet);
 
-    boolean delete(int id);
+    boolean delete(Bouquet bouquet);
 
     boolean deleteAll();
 

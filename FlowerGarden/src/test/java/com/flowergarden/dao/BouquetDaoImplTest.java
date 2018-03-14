@@ -45,30 +45,29 @@ public class BouquetDaoImplTest {
 
         bouquetTest = new MarriedBouquet();
         bouquetTest.setAssemblePrice(100);
-        int id = bouquetDao.add(bouquetTest);
 
         GeneralFlower flowerRose = new Rose();
         flowerRose.setPrice(50);
         flowerRose.setFreshness(new FreshnessInteger(1));
         flowerRose.setLenght(70);
         ((Rose)flowerRose).setSpike(true);
-        flowerRose.setBouquet(bouquetTest);
-        flowerDao.add(flowerRose);
+        bouquetTest.addFlower(flowerRose);
 
         GeneralFlower flowerChamomile = new Chamomile();
         flowerChamomile.setPrice(40);
         flowerChamomile.setFreshness(new FreshnessInteger(2));
         flowerChamomile.setLenght(50);
-        flowerChamomile.setBouquet(bouquetTest);
         ((Chamomile)flowerChamomile).setPetals(95);
-        flowerDao.add(flowerChamomile);
+        bouquetTest.addFlower(flowerChamomile);
+
 
         GeneralFlower flowerTulip = new Tulip();
         flowerTulip.setPrice(30);
         flowerTulip.setFreshness(new FreshnessInteger(3));
         flowerTulip.setLenght(45);
-        flowerTulip.setBouquet(bouquetTest);
-        flowerDao.add(flowerTulip);
+        bouquetTest.addFlower(flowerTulip);
+
+        bouquetDao.add(bouquetTest);
     }
 
     @After
@@ -91,9 +90,7 @@ public class BouquetDaoImplTest {
     @Test
     public void readFirstTest(){
 
-        Bouquet bouquet = new MarriedBouquet();
-        bouquetDao.add(bouquet);
-        Optional<Bouquet> bouquetFirst = bouquetDao.readFirst();
+       Optional<Bouquet> bouquetFirst = bouquetDao.readFirst();
 
         assertTrue(bouquetFirst.isPresent());
 
@@ -158,7 +155,7 @@ public class BouquetDaoImplTest {
 
         Bouquet bouquet = new MarriedBouquet();
         int id = bouquetDao.add(bouquet);
-        bouquetDao.delete(id);
+        bouquetDao.delete(bouquet);
 
         assertFalse(bouquetDao.read(id, FetchMode.LAZY).isPresent());
 
@@ -196,7 +193,7 @@ public class BouquetDaoImplTest {
     @Test
     public void getTotalPrice() {
 
-        float expected = 220f;
+        float expected = bouquetTest.getPrice();
         float actual = 0f;
 
         Optional<Bouquet> bouquet;

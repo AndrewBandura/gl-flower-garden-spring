@@ -1,5 +1,6 @@
 package com.flowergarden.dto;
 
+import com.flowergarden.dao.FetchMode;
 import com.flowergarden.model.bouquet.Bouquet;
 import com.flowergarden.model.bouquet.MarriedBouquet;
 import com.flowergarden.model.flowers.Chamomile;
@@ -69,6 +70,7 @@ public class DtoMapper {
         flower.setLenght(dto.getLenght());
         flower.setPrice(dto.getPrice());
         flower.setFreshness(new FreshnessInteger(dto.getFreshness()));
+
 
         if (flower instanceof Rose) {
             ((Rose) flower).setSpike(dto.isSpike());
