@@ -28,6 +28,8 @@ public class BouquetDaoImplTest {
     private static BouquetDao bouquetDao;
     private static FlowerDao flowerDao;
 
+    private int firstBouquetId;
+
     @BeforeClass
     public static void classSetUp(){
 
@@ -41,6 +43,8 @@ public class BouquetDaoImplTest {
         Bouquet bouquet = new MarriedBouquet();
         bouquet.setAssemblePrice(100);
         int id = bouquetDao.add(bouquet);
+
+        firstBouquetId = id;
 
         GeneralFlower flowerRose = new Rose();
         flowerRose.setPrice(50);
@@ -185,6 +189,24 @@ public class BouquetDaoImplTest {
         List<Bouquet> bouquetList =  bouquetDao.findAll(FetchMode.EAGER);
 
         assertTrue(bouquetList.size() > 0);
+
+    }
+
+    @Test
+    public void getTotalPrice() {
+
+        float expected = 220f;
+        float actual = 0f;
+
+        Optional<Bouquet> bouquet;
+
+        bouquet = bouquetDao.read(firstBouquetId, FetchMode.EAGER);
+
+        if (bouquet.isPresent()) {
+            actual = bouquet.get().getPrice();
+        }
+
+        assertEquals(expected, actual, 0f);
 
     }
 
