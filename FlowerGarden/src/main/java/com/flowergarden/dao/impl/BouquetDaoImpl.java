@@ -31,8 +31,8 @@ public class BouquetDaoImpl implements BouquetDao {
 
         int newId = 0;
 
-        try (PreparedStatement statement = connection.prepareStatement(
-                SQL_ADD)) {
+        try  {
+            PreparedStatement statement = connection.prepareStatement(SQL_ADD);
             statement.setObject(1, bouquet.getName());
             statement.setObject(2, bouquet.getAssemblePrice());
             statement.execute();
@@ -116,8 +116,8 @@ public class BouquetDaoImpl implements BouquetDao {
 
         boolean deleted = false;
 
-        try (PreparedStatement statement = connection.prepareStatement(SQL_DELETE)) {
-
+        try {
+            PreparedStatement statement = connection.prepareStatement(SQL_DELETE);
             statement.setObject(1, id);
             deleted = statement.execute();
 
@@ -151,8 +151,8 @@ public class BouquetDaoImpl implements BouquetDao {
         Map<Integer, List<GeneralFlower>> bouquetFlowers = new HashMap<>();
         Map<Integer, Bouquet> bouquets = new TreeMap<>();
 
-        try (Statement stmt = connection.createStatement()) {
-
+        try {
+            Statement stmt = connection.createStatement();
             String query = fetchMode == FetchMode.EAGER ? SQL_FIND_ALL_EAGER : SQL_FIND_ALL_LAZY;
 
             ResultSet rs = stmt.executeQuery(query);
