@@ -10,12 +10,10 @@ import com.flowergarden.model.flowers.Rose;
 import com.flowergarden.model.flowers.Tulip;
 import com.flowergarden.properties.FreshnessInteger;
 import com.flowergarden.util.ConnectionFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +24,7 @@ import static org.junit.Assert.*;
  */
 public class BouquetDaoImplTest {
 
+    private static Connection connection;
     private static BouquetDao bouquetDao;
     private static FlowerDao flowerDao;
 
@@ -34,10 +33,19 @@ public class BouquetDaoImplTest {
     @BeforeClass
     public static void classSetUp(){
 
-        Connection con = ConnectionFactory.getConnection("test");
+        connection = ConnectionFactory.getConnection("test");
 
-        bouquetDao = new BouquetDaoImpl(con);
-        flowerDao = new FlowerDaoImpl(con);
+        bouquetDao = new BouquetDaoImpl(connection);
+        flowerDao = new FlowerDaoImpl(connection);
+    }
+
+    @AfterClass
+    public static void classTearDown(){
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Before
