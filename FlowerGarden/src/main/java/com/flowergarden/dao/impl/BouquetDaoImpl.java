@@ -8,7 +8,6 @@ import com.flowergarden.dto.BouquetDto;
 import com.flowergarden.dto.DtoMapper;
 import com.flowergarden.dto.FlowerDto;
 import com.flowergarden.model.flowers.GeneralFlower;
-import com.flowergarden.util.ConnectionFactory;
 
 import java.sql.*;
 import java.util.*;
@@ -238,7 +237,7 @@ public class BouquetDaoImpl implements BouquetDao {
         BouquetDto dto = new BouquetDto();
         dto.setName(rs.getString("bouquet_name"));
         dto.setId(rs.getInt("bouquet_id"));
-        dto.setAssemblePrice(rs.getFloat("assemble_price"));
+        dto.setAssemblePrice(rs.getFloat("bouquet_assemble_price"));
 
         return dto;
 

@@ -1,13 +1,16 @@
 package com.flowergarden.dao.impl;
 
+import com.flowergarden.dao.FetchMode;
 import com.flowergarden.dao.FlowerDao;
+import com.flowergarden.dto.BouquetDto;
 import com.flowergarden.dto.DtoMapper;
 import com.flowergarden.dto.FlowerDto;
 import com.flowergarden.model.bouquet.Bouquet;
 import com.flowergarden.model.flowers.Chamomile;
 import com.flowergarden.model.flowers.GeneralFlower;
 import com.flowergarden.model.flowers.Rose;
-import com.flowergarden.util.ConnectionFactory;
+
+import com.flowergarden.dto.BouquetDto;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -34,7 +37,7 @@ public class FlowerDaoImpl implements FlowerDao {
             PreparedStatement stmt = connection.prepareStatement(SQL_ADD);
             stmt.setObject(1, flower.getName());
             stmt.setObject(2, flower.getLenght());
-            stmt.setObject(3, flower.getFreshness());
+            stmt.setObject(3, flower.getFreshness().getFreshness());
             stmt.setObject(4, flower.getPrice());
             Bouquet bouquet = flower.getBouquet();
 
@@ -69,12 +72,15 @@ public class FlowerDaoImpl implements FlowerDao {
     }
 
     @Override
-    public Optional<GeneralFlower> read(int id) {
+    public Optional<GeneralFlower> read(int id, FetchMode fetchMode) {
 
         Optional<GeneralFlower> flower = Optional.empty();
+        Optional<Bouquet> bouquet;
 
         try {
-            PreparedStatement stmt = connection.prepareStatement(SQL_READ);
+            String query = fetchMode == FetchMode.EAGER ? SQL_READ_EAGER : SQL_READ_LAZY;
+
+            PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setObject(1, id);
 
             ResultSet rs = stmt.executeQuery();
@@ -82,6 +88,19 @@ public class FlowerDaoImpl implements FlowerDao {
             while (rs.next()) {
                 FlowerDto flowerDto = getFlowerDto(rs);
                 flower = DtoMapper.getPojo(flowerDto);
+
+                if (fetchMode == FetchMode.EAGER) {
+                    BouquetDto bouquetDto = getBouquetDto(rs);
+
+                    if(!(bouquetDto == null)) {
+                        bouquet = DtoMapper.getPojo(bouquetDto);
+
+                        if (flower.isPresent() && bouquet.isPresent()) {
+                            flower.get().setBouquet(bouquet.get());
+                        }
+                    }
+                }
+
             }
 
         } catch (SQLException e) {
@@ -122,7 +141,7 @@ public class FlowerDaoImpl implements FlowerDao {
             PreparedStatement statement = connection.prepareStatement(SQL_UPDATE);
             statement.setObject(1, flower.getName());
             statement.setObject(2, flower.getLenght());
-            statement.setObject(3, flower.getFreshness());
+            statement.setObject(3, flower.getFreshness().getFreshness());
             statement.setObject(4, flower.getPrice());
 
             Bouquet bouquet = flower.getBouquet();
@@ -183,20 +202,30 @@ public class FlowerDaoImpl implements FlowerDao {
     }
 
     @Override
-    public List<GeneralFlower> findAll() {
+    public List<GeneralFlower> findAll(FetchMode fetchMode) {
 
         List<GeneralFlower> flowerList = new ArrayList<>();
 
         try {
+            String query = fetchMode == FetchMode.EAGER ? SQL_FIND_ALL_EAGER : SQL_FIND_ALL_LAZY;
             Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(SQL_FIND_ALL);
+            ResultSet rs = stmt.executeQuery(query);
 
-            if (rs.next()) {
+            while (rs.next()) {
                 FlowerDto flowerDto = getFlowerDto(rs);
                 Optional<GeneralFlower> flowerOpt = DtoMapper.getPojo(flowerDto);
                 if(flowerOpt.isPresent()){
                     GeneralFlower flower = flowerOpt.get();
                     flowerList.add(flower);
+
+                    if (fetchMode == FetchMode.EAGER) {
+                        BouquetDto bouquetDto = getBouquetDto(rs);
+                        if(!(bouquetDto == null)) {
+                            Optional<Bouquet> bouquetOpt = DtoMapper.getPojo(bouquetDto);
+                            bouquetOpt.ifPresent(flower::setBouquet);
+                        }
+                    }
+
                 }
             }
 
@@ -217,6 +246,20 @@ public class FlowerDaoImpl implements FlowerDao {
         dto.setFreshness(rs.getInt("freshness"));
         dto.setSpike(rs.getBoolean("spike"));
         dto.setPetals(rs.getInt("petals"));
+
+        return dto;
+
+    }
+
+    private BouquetDto getBouquetDto(ResultSet rs) throws SQLException {
+
+        if(rs.getInt("bouquet_id") == 0){
+            return null;
+        }
+        BouquetDto dto = new BouquetDto();
+        dto.setName(rs.getString("bouquet_name"));
+        dto.setId(rs.getInt("bouquet_id"));
+        dto.setAssemblePrice(rs.getFloat("bouquet_assemble_price"));
 
         return dto;
 

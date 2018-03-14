@@ -1,8 +1,15 @@
 package com.flowergarden.dao;
 
+import com.flowergarden.dao.impl.BouquetDaoImpl;
 import com.flowergarden.dao.impl.FlowerDaoImpl;
+import com.flowergarden.dto.BouquetDto;
+import com.flowergarden.model.bouquet.Bouquet;
+import com.flowergarden.model.bouquet.MarriedBouquet;
+import com.flowergarden.model.flowers.Chamomile;
 import com.flowergarden.model.flowers.GeneralFlower;
 import com.flowergarden.model.flowers.Rose;
+import com.flowergarden.model.flowers.Tulip;
+import com.flowergarden.properties.FreshnessInteger;
 import com.flowergarden.util.ConnectionFactory;
 import org.junit.*;
 
@@ -23,11 +30,13 @@ public class FlowerDaoImplTest {
 
     private static Connection connection;
     private static FlowerDao flowerDao;
+    private static BouquetDao bouquetDao;
 
     @BeforeClass
     public static void classSetUp(){
         connection = ConnectionFactory.getConnection("test");
         flowerDao = new FlowerDaoImpl(connection);
+        bouquetDao = new BouquetDaoImpl(connection);
     }
 
     @AfterClass
@@ -42,8 +51,30 @@ public class FlowerDaoImplTest {
     @Before
     public void setUp(){
 
-        GeneralFlower flower = new Rose();
-        flowerDao.add(flower);
+        Bouquet bouquetTest = new MarriedBouquet();
+        bouquetTest.setAssemblePrice(100);
+
+        GeneralFlower flowerRose = new Rose();
+        flowerRose.setPrice(50);
+        flowerRose.setFreshness(new FreshnessInteger(1));
+        flowerRose.setLenght(70);
+        ((Rose)flowerRose).setSpike(true);
+        bouquetTest.addFlower(flowerRose);
+
+        GeneralFlower flowerChamomile = new Chamomile();
+        flowerChamomile.setPrice(40);
+        flowerChamomile.setFreshness(new FreshnessInteger(2));
+        flowerChamomile.setLenght(50);
+        ((Chamomile)flowerChamomile).setPetals(95);
+        bouquetTest.addFlower(flowerChamomile);
+
+        GeneralFlower flowerTulip = new Tulip();
+        flowerTulip.setPrice(30);
+        flowerTulip.setFreshness(new FreshnessInteger(3));
+        flowerTulip.setLenght(45);
+        bouquetTest.addFlower(flowerTulip);
+
+        bouquetDao.add(bouquetTest);
 
     }
 
@@ -57,8 +88,11 @@ public class FlowerDaoImplTest {
     @Test
     public void addTest(){
 
-        GeneralFlower flower = new GeneralFlower();
-        int id = flowerDao.add(flower);
+        GeneralFlower flowerTulip = new Tulip();
+        flowerTulip.setPrice(30);
+        flowerTulip.setFreshness(new FreshnessInteger(3));
+        flowerTulip.setLenght(45);
+        int id = flowerDao.add(flowerTulip);
 
         assertTrue(id > 0);
     }
@@ -66,11 +100,39 @@ public class FlowerDaoImplTest {
     @Test
     public void readFirstTest(){
 
-        GeneralFlower flower = new GeneralFlower();
-        flowerDao.add(flower);
         Optional<GeneralFlower> flowerFirst = flowerDao.readFirst();
 
         assertTrue(flowerFirst.isPresent());
+
+    }
+
+    @Test
+    public void readLazyTest() {
+
+        Optional<GeneralFlower> flower = Optional.empty();
+        Optional<GeneralFlower> flowerFirst = flowerDao.readFirst();
+
+        if (flowerFirst.isPresent()) {
+            int id = flowerFirst.get().getId();
+            flower = flowerDao.read(id, FetchMode.LAZY);
+        }
+
+        assertTrue(flower.isPresent());
+
+    }
+
+    @Test
+    public void readEagerTest() {
+
+        Optional<GeneralFlower> flower = Optional.empty();
+        Optional<GeneralFlower> flowerFirst = flowerDao.readFirst();
+
+        if (flowerFirst.isPresent()) {
+            int id = flowerFirst.get().getId();
+            flower = flowerDao.read(id, FetchMode.EAGER);
+        }
+
+        assertTrue(flower.isPresent());
 
     }
 
@@ -89,13 +151,11 @@ public class FlowerDaoImplTest {
         flower.setPrice(expected);
         flowerDao.update(flower);
 
-        Optional<GeneralFlower> updatedFlowerOpt = flowerDao.read(flower.getId());
-
-        if(!updatedFlowerOpt.isPresent()){
-            assertTrue(false);
+        Optional<GeneralFlower> updatedFlowerOpt = flowerDao.read(flower.getId(), FetchMode.LAZY);
+        float actual = 0f;
+        if (updatedFlowerOpt.isPresent()) {
+            actual = updatedFlowerOpt.get().getPrice();
         }
-
-        float actual = updatedFlowerOpt.get().getPrice();
 
         assertEquals(expected, actual, 0.0f);
 
@@ -104,11 +164,15 @@ public class FlowerDaoImplTest {
     @Test
     public void deleteTest(){
 
-        GeneralFlower flower = new Rose();
-        int id = flowerDao.add(flower);
-        flowerDao.delete(flower);
+        Optional<GeneralFlower> flowerOpt = flowerDao.readFirst();
+        int id = 0;
+        if(!flowerOpt.isPresent()){
+            GeneralFlower flower = flowerOpt.get();
+            id = flower.getId();
+            flowerDao.delete(flower);
+        }
 
-        assertFalse(flowerDao.read(id).isPresent());
+        assertFalse(flowerDao.read(id, FetchMode.LAZY).isPresent());
 
     }
 
@@ -117,17 +181,25 @@ public class FlowerDaoImplTest {
 
         flowerDao.deleteAll();
 
-        assertTrue(flowerDao.findAll().size() == 0);
+        assertTrue(flowerDao.findAll(FetchMode.LAZY).size() == 0);
 
     }
 
+    @Test
+    public void findAllLazyTest(){
+
+        List flowersList =  flowerDao.findAll(FetchMode.LAZY);
+
+        assertTrue(flowersList.size()==3);
+
+    }
 
     @Test
-    public void findAllTest(){
+    public void findAllEagerTest(){
 
-        List flowersList =  flowerDao.findAll();
+        List flowersList =  flowerDao.findAll(FetchMode.EAGER);
 
-        assertNotNull(flowersList);
+        assertTrue(flowersList.size()==3);
 
     }
 
