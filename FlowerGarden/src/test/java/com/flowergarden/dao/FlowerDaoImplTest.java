@@ -27,7 +27,7 @@ public class FlowerDaoImplTest {
     @BeforeClass
     public static void classSetUp(){
 
-        flowerDao = new FlowerDaoImpl(new ConnectionFactory("test"));
+        flowerDao = new FlowerDaoImpl(ConnectionFactory.getConnection("test"));
     }
 
     @Before

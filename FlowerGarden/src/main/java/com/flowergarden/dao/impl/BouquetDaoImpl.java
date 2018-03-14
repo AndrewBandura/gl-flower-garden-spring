@@ -18,12 +18,12 @@ import java.util.*;
  */
 public class BouquetDaoImpl implements BouquetDao {
 
-    private ConnectionFactory connectionFactory;
+    private Connection connection;
     private FlowerDao flowerDao;
 
-    public BouquetDaoImpl(ConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
-        flowerDao = new FlowerDaoImpl(connectionFactory);
+    public BouquetDaoImpl(Connection connection) {
+        this.connection = connection;
+        flowerDao = new FlowerDaoImpl(connection);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class BouquetDaoImpl implements BouquetDao {
 
         int newId = 0;
 
-        try (PreparedStatement statement = connectionFactory.getConnection().prepareStatement(
+        try (PreparedStatement statement = connection.prepareStatement(
                 SQL_ADD)) {
             statement.setObject(1, bouquet.getName());
             statement.setObject(2, bouquet.getAssemblePrice());
@@ -58,9 +58,8 @@ public class BouquetDaoImpl implements BouquetDao {
 
         boolean updated = false;
 
-        try (PreparedStatement statement = connectionFactory.getConnection().prepareStatement(
-                SQL_UPDATE)) {
-
+        try  {
+            PreparedStatement statement = connection.prepareStatement(SQL_UPDATE);
             statement.setObject(1, bouquet.getName());
             statement.setObject(2, bouquet.getAssemblePrice());
             statement.setObject(3, bouquet.getId());
@@ -80,8 +79,8 @@ public class BouquetDaoImpl implements BouquetDao {
 
         String query = fetchMode == FetchMode.EAGER ? SQL_READ_EAGER : SQL_READ_LAZY;
 
-        try (PreparedStatement stmt = connectionFactory.getConnection().prepareStatement(query)) {
-
+        try  {
+            PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setObject(1, id);
             ResultSet rs = stmt.executeQuery();
 
@@ -99,8 +98,8 @@ public class BouquetDaoImpl implements BouquetDao {
 
         Optional<Bouquet> bouquet = Optional.empty();
 
-        try (Statement stmt = connectionFactory.getConnection().createStatement()) {
-
+        try  {
+            Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL_READ_FIRST);
 
             bouquet = composeBouquet(rs, bouquet, FetchMode.LAZY);
@@ -117,7 +116,7 @@ public class BouquetDaoImpl implements BouquetDao {
 
         boolean deleted = false;
 
-        try (PreparedStatement statement = connectionFactory.getConnection().prepareStatement(SQL_DELETE)) {
+        try (PreparedStatement statement = connection.prepareStatement(SQL_DELETE)) {
 
             statement.setObject(1, id);
             deleted = statement.execute();
@@ -134,11 +133,9 @@ public class BouquetDaoImpl implements BouquetDao {
 
         boolean deleted = false;
 
-        try (Connection con = connectionFactory.getConnection()) {
-            Statement stmt = con.createStatement();
-            stmt.addBatch(SQL_DELETE_ALL);
-            stmt.addBatch("Vacuum");
-            stmt.executeBatch();
+        try {
+            Statement stmt = connection.createStatement();
+            stmt.executeUpdate(SQL_DELETE_ALL);
             deleted = true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -154,7 +151,7 @@ public class BouquetDaoImpl implements BouquetDao {
         Map<Integer, List<GeneralFlower>> bouquetFlowers = new HashMap<>();
         Map<Integer, Bouquet> bouquets = new TreeMap<>();
 
-        try (Statement stmt = connectionFactory.getConnection().createStatement()) {
+        try (Statement stmt = connection.createStatement()) {
 
             String query = fetchMode == FetchMode.EAGER ? SQL_FIND_ALL_EAGER : SQL_FIND_ALL_LAZY;
 

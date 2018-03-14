@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,8 +34,10 @@ public class BouquetDaoImplTest {
     @BeforeClass
     public static void classSetUp(){
 
-        bouquetDao = new BouquetDaoImpl(new ConnectionFactory("test"));
-        flowerDao = new FlowerDaoImpl(new ConnectionFactory("test"));
+        Connection con = ConnectionFactory.getConnection("test");
+
+        bouquetDao = new BouquetDaoImpl(con);
+        flowerDao = new FlowerDaoImpl(con);
     }
 
     @Before

@@ -19,10 +19,10 @@ import java.util.Optional;
  */
 public class FlowerDaoImpl implements FlowerDao {
 
-    private ConnectionFactory connectionFactory;
+    private Connection connection;
 
-    public FlowerDaoImpl(ConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
+    public FlowerDaoImpl(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
@@ -30,8 +30,8 @@ public class FlowerDaoImpl implements FlowerDao {
 
         int newId = 0;
 
-        try (PreparedStatement stmt = connectionFactory.getConnection().prepareStatement(SQL_ADD)) {
-
+        try {
+            PreparedStatement stmt = connection.prepareStatement(SQL_ADD);
             stmt.setObject(1, flower.getName());
             stmt.setObject(2, flower.getLenght());
             stmt.setObject(3, flower.getFreshness());
@@ -72,8 +72,8 @@ public class FlowerDaoImpl implements FlowerDao {
 
         Optional<GeneralFlower> flower = Optional.empty();
 
-        try (PreparedStatement stmt = connectionFactory.getConnection().prepareStatement(FlowerDao.SQL_READ)) {
-
+        try {
+            PreparedStatement stmt = connection.prepareStatement(SQL_READ);
             stmt.setObject(1, id);
 
             ResultSet rs = stmt.executeQuery();
@@ -96,8 +96,8 @@ public class FlowerDaoImpl implements FlowerDao {
 
         Optional<GeneralFlower> flower = Optional.empty();
 
-        try (Statement stmt = connectionFactory.getConnection().createStatement()) {
-
+        try {
+            Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL_READ_FIRST);
 
             if (rs.next()) {
@@ -117,9 +117,8 @@ public class FlowerDaoImpl implements FlowerDao {
 
         boolean updated = false;
 
-        try (PreparedStatement statement = connectionFactory.getConnection().prepareStatement(
-                SQL_UPDATE)) {
-
+        try {
+            PreparedStatement statement = connection.prepareStatement(SQL_UPDATE);
             statement.setObject(1, flower.getName());
             statement.setObject(2, flower.getLenght());
             statement.setObject(3, flower.getFreshness());
@@ -152,9 +151,8 @@ public class FlowerDaoImpl implements FlowerDao {
 
         boolean deleted = false;
 
-        try (PreparedStatement statement = connectionFactory.getConnection().prepareStatement(
-                SQL_DELETE)) {
-
+        try {
+            PreparedStatement statement = connection.prepareStatement(SQL_DELETE);
             statement.setObject(1, id);
             deleted = statement.execute();
 
@@ -171,11 +169,9 @@ public class FlowerDaoImpl implements FlowerDao {
 
         boolean deleted = false;
 
-        try (Connection con = connectionFactory.getConnection()) {
-            Statement stmt = con.createStatement();
-            stmt.addBatch(SQL_DELETE_ALL);
-            stmt.addBatch("Vacuum");
-            stmt.executeBatch();
+        try {
+            Statement stmt = connection.createStatement();
+            stmt.executeUpdate(SQL_DELETE_ALL);
             deleted = true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -189,8 +185,8 @@ public class FlowerDaoImpl implements FlowerDao {
 
         List<GeneralFlower> flowerList = new ArrayList<>();
 
-        try (Statement stmt = connectionFactory.getConnection().createStatement()) {
-
+        try {
+            Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL_FIND_ALL);
 
             if (rs.next()) {

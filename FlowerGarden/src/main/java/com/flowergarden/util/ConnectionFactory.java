@@ -13,15 +13,7 @@ import java.util.Properties;
  */
 public class ConnectionFactory {
 
-    private String url;
-    private String mode;
-
-    public ConnectionFactory(String mode) {
-        this.mode = mode;
-        this.url = getUrl(this.mode);
-    }
-
-    private String getUrl(String mode) {
+   private static String getUrl(String mode) {
 
         String dbPath;
         Properties prop = new Property().getProperties();
@@ -43,7 +35,10 @@ public class ConnectionFactory {
         return "";
     }
 
-    public Connection getConnection() {
+    public static Connection getConnection(String mode) {
+
+       String url = getUrl(mode);
+
         try {
             return DriverManager.getConnection(url);
         } catch (SQLException ex) {
