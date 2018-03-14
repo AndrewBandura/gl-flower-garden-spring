@@ -19,6 +19,5 @@ public class FlowerDto {
     private float price;
     private int petals;
     private boolean spike;
-    private int bouquet_id;
 
 }

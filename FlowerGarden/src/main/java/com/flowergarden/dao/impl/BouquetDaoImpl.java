@@ -80,15 +80,33 @@ public class BouquetDaoImpl implements BouquetDao {
         boolean updated = false;
 
         try {
+            Bouquet storedBouquet;
+            Optional<Bouquet> storedBouquetOpt = read(bouquet.getId(), FetchMode.EAGER);
+            if (storedBouquetOpt.isPresent()) {
+                storedBouquet = storedBouquetOpt.get();
+                Collection<GeneralFlower> flowers = storedBouquet.getFlowers();
+                for (GeneralFlower flower : flowers) {
+                    flower.setBouquet(null);
+                    flowerDao.update(flower);
+                }
+            }
+
             PreparedStatement statement = connection.prepareStatement(SQL_UPDATE);
             statement.setObject(1, bouquet.getName());
             statement.setObject(2, bouquet.getAssemblePrice());
             statement.setObject(3, bouquet.getId());
             updated = statement.execute();
 
+            Collection<GeneralFlower> flowers = bouquet.getFlowers();
+            for (GeneralFlower flower : flowers) {
+                flower.setBouquet(bouquet);
+                flowerDao.update(flower);
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
 
         return updated;
     }
@@ -138,33 +156,12 @@ public class BouquetDaoImpl implements BouquetDao {
         boolean deleted = false;
 
         try {
-            connection.setAutoCommit(false);
-
             PreparedStatement statement = connection.prepareStatement(SQL_DELETE);
             statement.setObject(1, bouquet.getId());
             deleted = statement.execute();
 
-            Collection<GeneralFlower> flowers = bouquet.getFlowers();
-            for (GeneralFlower flower : flowers) {
-                flower.setBouquet(null);
-                flowerDao.update(flower);
-            }
-
-            connection.commit();
-
         } catch (SQLException e) {
             e.printStackTrace();
-            try {
-                connection.rollback();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-            }
-
-            try {
-                connection.setAutoCommit(true);
-            } catch (SQLException e2) {
-                e2.printStackTrace();
-            }
         }
 
         return deleted;

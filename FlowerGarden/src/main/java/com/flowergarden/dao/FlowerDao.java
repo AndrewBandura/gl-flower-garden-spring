@@ -20,8 +20,8 @@ public interface FlowerDao {
 
     String SQL_READ_FIRST = "SELECT * FROM flower ORDER BY ID ASC LIMIT 1";
 
-    String SQL_UPDATE = "UPDATE flower SET name = ?, lenght = ?, freshness = ?, price = ?, petals =?, spike = ?, " +
-            "bouquet_id = ? WHERE id = ?";
+    String SQL_UPDATE = "UPDATE flower SET name = ?, lenght = ?, freshness = ?, price = ?, petals =?, spike = ?," +
+            " bouquet_id = ? WHERE id = ?";
 
     String SQL_DELETE = "DELETE FROM flower WHERE id = ?";
 
