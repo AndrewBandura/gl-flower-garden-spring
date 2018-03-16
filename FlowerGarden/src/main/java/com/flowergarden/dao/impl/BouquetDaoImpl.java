@@ -17,6 +17,28 @@ import java.util.*;
  */
 public class BouquetDaoImpl implements BouquetDao {
 
+    private final static String SQL_ADD = "INSERT INTO bouquet(`name`, `assemble_price`) " +
+            "VALUES(?, ?)";
+    private final static String SQL_UPDATE = "Update bouquet set name = ?, assemble_price= ? where id = ?";
+
+    private final static String SQL_READ_LAZY = "SELECT bouquet.id as bouquet_id, bouquet.name as bouquet_name, bouquet.assemble_price AS bouquet_assemble_price FROM  bouquet WHERE id = ?";
+
+    private final static String SQL_READ_EAGER = "SELECT bouquet.id as bouquet_id, bouquet.name as bouquet_name, bouquet.assemble_price AS bouquet_assemble_price," +
+            "flower.*, flower.bouquet_id AS flower_bouquet_id FROM bouquet" +
+            " LEFT JOIN flower ON bouquet.id = flower.bouquet_id WHERE bouquet.id = ? ORDER BY bouquet_id";
+
+    private final static String SQL_READ_FIRST = "SELECT bouquet.id as bouquet_id, bouquet.name as bouquet_name, bouquet.assemble_price AS bouquet_assemble_price FROM bouquet ORDER BY ID ASC LIMIT 1";
+
+    private final static String SQL_DELETE = "DELETE FROM bouquet WHERE Id = ?";
+
+    private final static String SQL_DELETE_ALL = "DELETE FROM bouquet";
+
+    private final static String SQL_FIND_ALL_LAZY = "SELECT bouquet.id as bouquet_id, bouquet.name as bouquet_name, bouquet.assemble_price  AS bouquet_assemble_price FROM  bouquet";
+
+    private final static String SQL_FIND_ALL_EAGER = "SELECT bouquet.id AS bouquet_id, bouquet.name AS bouquet_name, bouquet.assemble_price  AS bouquet_assemble_price, " +
+            "flower.*, flower.bouquet_id AS flower_bouquet_id FROM bouquet" +
+            " LEFT JOIN flower ON bouquet.id = flower.bouquet_id  ORDER BY bouquet_id";
+
     private Connection connection;
     private FlowerDao flowerDao;
 

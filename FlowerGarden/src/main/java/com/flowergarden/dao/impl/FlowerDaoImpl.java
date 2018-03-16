@@ -22,6 +22,32 @@ import java.util.Optional;
  */
 public class FlowerDaoImpl implements FlowerDao {
 
+    private final static String SQL_ADD = "INSERT INTO flower(`name`, `lenght`, `freshness`, `price`, `petals`, `spike`, `bouquet_id`) " +
+            "VALUES(?,?,?,?,?,?,?)";
+
+    private final static String SQL_READ_LAZY = "SELECT * FROM flower where id = ?";
+
+    private final static String SQL_READ_EAGER = "SELECT flower.id, flower.name, flower.lenght, flower.freshness, flower.price," +
+            " flower.petals, flower.spike, bouquet.id AS bouquet_id, bouquet.name AS bouquet_name," +
+            " bouquet.assemble_price AS bouquet_assemble_price FROM flower left join bouquet on" +
+            " flower.bouquet_id = bouquet.id where flower.id = ?";
+
+    private final static String SQL_READ_FIRST = "SELECT * FROM flower ORDER BY ID ASC LIMIT 1";
+
+    private final static String SQL_UPDATE = "UPDATE flower SET name = ?, lenght = ?, freshness = ?, price = ?, petals =?, spike = ?," +
+            " bouquet_id = ? WHERE id = ?";
+
+    private final static String SQL_DELETE = "DELETE FROM flower WHERE id = ?";
+
+    private final static String SQL_DELETE_ALL = "DELETE FROM flower";
+
+    private final static String SQL_FIND_ALL_LAZY = "SELECT * FROM flower";
+
+    private final static String SQL_FIND_ALL_EAGER = "SELECT flower.id, flower.name, flower.lenght, flower.freshness, flower.price," +
+            " flower.petals, flower.spike, bouquet.id AS bouquet_id, bouquet.name AS bouquet_name," +
+            " bouquet.assemble_price AS bouquet_assemble_price FROM flower left join bouquet on" +
+            " flower.bouquet_id = bouquet.id";
+
     private Connection connection;
 
     public FlowerDaoImpl(Connection connection) {
