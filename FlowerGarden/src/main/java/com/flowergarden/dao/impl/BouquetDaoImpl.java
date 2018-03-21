@@ -8,6 +8,7 @@ import com.flowergarden.dto.BouquetDto;
 import com.flowergarden.dto.DtoMapper;
 import com.flowergarden.dto.FlowerDto;
 import com.flowergarden.model.flowers.GeneralFlower;
+import lombok.Setter;
 
 import java.sql.*;
 import java.util.*;
@@ -15,6 +16,7 @@ import java.util.*;
 /**
  * @author Andrew Bandura
  */
+@Setter
 public class BouquetDaoImpl implements BouquetDao {
 
     private final static String SQL_ADD = "INSERT INTO bouquet(`name`, `assemble_price`) " +
@@ -45,6 +47,9 @@ public class BouquetDaoImpl implements BouquetDao {
     public BouquetDaoImpl(Connection connection) {
         this.connection = connection;
         this.flowerDao = new FlowerDaoImpl(connection);
+    }
+
+    public BouquetDaoImpl() {
     }
 
     @Override

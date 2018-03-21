@@ -2,7 +2,6 @@ package com.flowergarden.dao;
 
 import com.flowergarden.dao.impl.BouquetDaoImpl;
 import com.flowergarden.dao.impl.FlowerDaoImpl;
-import com.flowergarden.dto.BouquetDto;
 import com.flowergarden.model.bouquet.Bouquet;
 import com.flowergarden.model.bouquet.MarriedBouquet;
 import com.flowergarden.model.flowers.Chamomile;
@@ -10,17 +9,15 @@ import com.flowergarden.model.flowers.GeneralFlower;
 import com.flowergarden.model.flowers.Rose;
 import com.flowergarden.model.flowers.Tulip;
 import com.flowergarden.properties.FreshnessInteger;
-import com.flowergarden.util.ConnectionFactory;
 import org.junit.*;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -28,25 +25,17 @@ import static org.junit.Assert.assertTrue;
  */
 public class FlowerDaoImplTest {
 
-    private static Connection connection;
     private static FlowerDao flowerDao;
     private static BouquetDao bouquetDao;
 
     @BeforeClass
     public static void classSetUp(){
-        connection = ConnectionFactory.getConnection("test");
-        flowerDao = new FlowerDaoImpl(connection);
-        bouquetDao = new BouquetDaoImpl(connection);
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("application-context.xml");
+        bouquetDao = ctx.getBean("testBouquetDao", BouquetDaoImpl.class);
+        flowerDao = ctx.getBean("testFlowerDao", FlowerDaoImpl.class);
+
     }
 
-    @AfterClass
-    public static void classTearDown(){
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Before
     public void setUp(){

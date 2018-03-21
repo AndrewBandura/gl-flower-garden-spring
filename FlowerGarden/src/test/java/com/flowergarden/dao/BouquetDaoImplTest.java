@@ -9,11 +9,10 @@ import com.flowergarden.model.flowers.GeneralFlower;
 import com.flowergarden.model.flowers.Rose;
 import com.flowergarden.model.flowers.Tulip;
 import com.flowergarden.properties.FreshnessInteger;
-import com.flowergarden.util.ConnectionFactory;
 import org.junit.*;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +23,6 @@ import static org.junit.Assert.*;
  */
 public class BouquetDaoImplTest {
 
-    private static Connection connection;
     private static BouquetDao bouquetDao;
     private static FlowerDao flowerDao;
 
@@ -33,20 +31,11 @@ public class BouquetDaoImplTest {
     @BeforeClass
     public static void classSetUp(){
 
-        connection = ConnectionFactory.getConnection("test");
-
-        bouquetDao = new BouquetDaoImpl(connection);
-        flowerDao = new FlowerDaoImpl(connection);
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("application-context.xml");
+        bouquetDao = ctx.getBean("testBouquetDao", BouquetDaoImpl.class);
+        flowerDao = ctx.getBean("testFlowerDao", FlowerDaoImpl.class);
     }
 
-    @AfterClass
-    public static void classTearDown(){
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Before
     public void setUp(){

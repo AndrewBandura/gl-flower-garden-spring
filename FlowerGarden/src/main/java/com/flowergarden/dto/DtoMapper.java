@@ -1,8 +1,6 @@
 package com.flowergarden.dto;
 
-import com.flowergarden.dao.FetchMode;
 import com.flowergarden.model.bouquet.Bouquet;
-import com.flowergarden.model.bouquet.MarriedBouquet;
 import com.flowergarden.model.flowers.Chamomile;
 import com.flowergarden.model.flowers.GeneralFlower;
 import com.flowergarden.model.flowers.Rose;
@@ -18,7 +16,7 @@ import java.util.Properties;
  */
 public class DtoMapper {
 
-    private static Properties properties = (new Property()).getProperties();
+    private static final Properties properties = (new Property()).getProperties();
 
     public static Optional<Bouquet> getPojo(BouquetDto dto) {
 

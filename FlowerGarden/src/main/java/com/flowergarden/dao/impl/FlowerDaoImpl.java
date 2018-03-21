@@ -2,7 +2,6 @@ package com.flowergarden.dao.impl;
 
 import com.flowergarden.dao.FetchMode;
 import com.flowergarden.dao.FlowerDao;
-import com.flowergarden.dto.BouquetDto;
 import com.flowergarden.dto.DtoMapper;
 import com.flowergarden.dto.FlowerDto;
 import com.flowergarden.model.bouquet.Bouquet;
@@ -11,6 +10,7 @@ import com.flowergarden.model.flowers.GeneralFlower;
 import com.flowergarden.model.flowers.Rose;
 
 import com.flowergarden.dto.BouquetDto;
+import lombok.Setter;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ import java.util.Optional;
 /**
  * @author Andrew Bandura
  */
+@Setter
 public class FlowerDaoImpl implements FlowerDao {
 
     private final static String SQL_ADD = "INSERT INTO flower(`name`, `lenght`, `freshness`, `price`, `petals`, `spike`, `bouquet_id`) " +
@@ -52,6 +53,9 @@ public class FlowerDaoImpl implements FlowerDao {
 
     public FlowerDaoImpl(Connection connection) {
         this.connection = connection;
+    }
+
+    public FlowerDaoImpl() {
     }
 
     @Override
