@@ -2,6 +2,7 @@ package com.flowergarden.dao.impl;
 
 import com.flowergarden.dao.FetchMode;
 import com.flowergarden.dao.FlowerDao;
+import com.flowergarden.dto.BouquetDto;
 import com.flowergarden.dto.DtoMapper;
 import com.flowergarden.dto.FlowerDto;
 import com.flowergarden.model.bouquet.Bouquet;
@@ -9,8 +10,9 @@ import com.flowergarden.model.flowers.Chamomile;
 import com.flowergarden.model.flowers.GeneralFlower;
 import com.flowergarden.model.flowers.Rose;
 
-import com.flowergarden.dto.BouquetDto;
-import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ import java.util.Optional;
 /**
  * @author Andrew Bandura
  */
-@Setter
+@Repository
 public class FlowerDaoImpl implements FlowerDao {
 
     private final static String SQL_ADD = "INSERT INTO flower(`name`, `lenght`, `freshness`, `price`, `petals`, `spike`, `bouquet_id`) " +
@@ -49,21 +51,15 @@ public class FlowerDaoImpl implements FlowerDao {
             " bouquet.assemble_price AS bouquet_assemble_price FROM flower left join bouquet on" +
             " flower.bouquet_id = bouquet.id";
 
-    private Connection connection;
-
-    public FlowerDaoImpl(Connection connection) {
-        this.connection = connection;
-    }
-
-    public FlowerDaoImpl() {
-    }
+    @Autowired
+    private DriverManagerDataSource dataSource;
 
     @Override
     public int add(GeneralFlower flower) {
 
         int newId = 0;
 
-        try {
+        try(Connection connection = dataSource.getConnection()) {
             PreparedStatement stmt = connection.prepareStatement(SQL_ADD);
             stmt.setObject(1, flower.getName());
             stmt.setObject(2, flower.getLenght());
@@ -107,7 +103,7 @@ public class FlowerDaoImpl implements FlowerDao {
         Optional<GeneralFlower> flower = Optional.empty();
         Optional<Bouquet> bouquet;
 
-        try {
+        try(Connection connection = dataSource.getConnection()) {
             String query = fetchMode == FetchMode.EAGER ? SQL_READ_EAGER : SQL_READ_LAZY;
 
             PreparedStatement stmt = connection.prepareStatement(query);
@@ -146,7 +142,7 @@ public class FlowerDaoImpl implements FlowerDao {
 
         Optional<GeneralFlower> flower = Optional.empty();
 
-        try {
+        try(Connection connection = dataSource.getConnection()) {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL_READ_FIRST);
 
@@ -167,7 +163,7 @@ public class FlowerDaoImpl implements FlowerDao {
 
         boolean updated = false;
 
-        try {
+        try(Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SQL_UPDATE);
             statement.setObject(1, flower.getName());
             statement.setObject(2, flower.getLenght());
@@ -202,7 +198,7 @@ public class FlowerDaoImpl implements FlowerDao {
 
         boolean deleted = false;
 
-        try {
+        try(Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SQL_DELETE);
             statement.setObject(1, flower.getId());
             deleted = statement.execute();
@@ -220,7 +216,7 @@ public class FlowerDaoImpl implements FlowerDao {
 
         boolean deleted = false;
 
-        try {
+        try(Connection connection = dataSource.getConnection()) {
             Statement stmt = connection.createStatement();
             stmt.executeUpdate(SQL_DELETE_ALL);
             deleted = true;
@@ -236,7 +232,7 @@ public class FlowerDaoImpl implements FlowerDao {
 
         List<GeneralFlower> flowerList = new ArrayList<>();
 
-        try {
+        try(Connection connection = dataSource.getConnection()) {
             String query = fetchMode == FetchMode.EAGER ? SQL_FIND_ALL_EAGER : SQL_FIND_ALL_LAZY;
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(query);

@@ -8,7 +8,9 @@ import com.flowergarden.dto.BouquetDto;
 import com.flowergarden.dto.DtoMapper;
 import com.flowergarden.dto.FlowerDto;
 import com.flowergarden.model.flowers.GeneralFlower;
-import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.*;
@@ -16,7 +18,7 @@ import java.util.*;
 /**
  * @author Andrew Bandura
  */
-@Setter
+@Repository
 public class BouquetDaoImpl implements BouquetDao {
 
     private final static String SQL_ADD = "INSERT INTO bouquet(`name`, `assemble_price`) " +
@@ -41,24 +43,19 @@ public class BouquetDaoImpl implements BouquetDao {
             "flower.*, flower.bouquet_id AS flower_bouquet_id FROM bouquet" +
             " LEFT JOIN flower ON bouquet.id = flower.bouquet_id  ORDER BY bouquet_id";
 
-    private Connection connection;
+
+    @Autowired
     private FlowerDao flowerDao;
 
-    public BouquetDaoImpl(Connection connection) {
-        this.connection = connection;
-        this.flowerDao = new FlowerDaoImpl(connection);
-    }
-
-    public BouquetDaoImpl() {
-    }
+    @Autowired
+    private DriverManagerDataSource dataSource;
 
     @Override
     public int add(Bouquet bouquet) {
 
         int newId = 0;
 
-        try {
-            connection.setAutoCommit(false);
+        try(Connection connection = dataSource.getConnection()) {
 
             PreparedStatement statement = connection.prepareStatement(SQL_ADD);
             statement.setObject(1, bouquet.getName());
@@ -80,21 +77,9 @@ public class BouquetDaoImpl implements BouquetDao {
                 flowerDao.add(flower);
             }
 
-            connection.commit();
-
         } catch (SQLException e) {
             e.printStackTrace();
-            try {
-                connection.rollback();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-            }
-        }
 
-        try {
-            connection.setAutoCommit(true);
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
 
         return newId;
@@ -105,7 +90,7 @@ public class BouquetDaoImpl implements BouquetDao {
 
         boolean updated = false;
 
-        try {
+        try(Connection connection = dataSource.getConnection()) {
             Bouquet storedBouquet;
             Optional<Bouquet> storedBouquetOpt = read(bouquet.getId(), FetchMode.EAGER);
             if (storedBouquetOpt.isPresent()) {
@@ -144,7 +129,7 @@ public class BouquetDaoImpl implements BouquetDao {
 
         String query = fetchMode == FetchMode.EAGER ? SQL_READ_EAGER : SQL_READ_LAZY;
 
-        try {
+        try(Connection connection = dataSource.getConnection()) {
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setObject(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -163,7 +148,7 @@ public class BouquetDaoImpl implements BouquetDao {
 
         Optional<Bouquet> bouquet = Optional.empty();
 
-        try {
+        try(Connection connection = dataSource.getConnection()) {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL_READ_FIRST);
 
@@ -181,7 +166,7 @@ public class BouquetDaoImpl implements BouquetDao {
 
         boolean deleted = false;
 
-        try {
+        try(Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SQL_DELETE);
             statement.setObject(1, bouquet.getId());
             deleted = statement.execute();
@@ -198,7 +183,7 @@ public class BouquetDaoImpl implements BouquetDao {
 
         boolean deleted = false;
 
-        try {
+        try(Connection connection = dataSource.getConnection()) {
             Statement stmt = connection.createStatement();
             stmt.executeUpdate(SQL_DELETE_ALL);
             deleted = true;
@@ -216,7 +201,7 @@ public class BouquetDaoImpl implements BouquetDao {
         Map<Integer, List<GeneralFlower>> bouquetFlowers = new HashMap<>();
         Map<Integer, Bouquet> bouquets = new TreeMap<>();
 
-        try {
+        try(Connection connection = dataSource.getConnection()) {
             Statement stmt = connection.createStatement();
             String query = fetchMode == FetchMode.EAGER ? SQL_FIND_ALL_EAGER : SQL_FIND_ALL_LAZY;
 

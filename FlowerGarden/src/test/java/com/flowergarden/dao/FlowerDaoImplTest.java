@@ -1,7 +1,5 @@
 package com.flowergarden.dao;
 
-import com.flowergarden.dao.impl.BouquetDaoImpl;
-import com.flowergarden.dao.impl.FlowerDaoImpl;
 import com.flowergarden.model.bouquet.Bouquet;
 import com.flowergarden.model.bouquet.MarriedBouquet;
 import com.flowergarden.model.flowers.Chamomile;
@@ -10,8 +8,11 @@ import com.flowergarden.model.flowers.Rose;
 import com.flowergarden.model.flowers.Tulip;
 import com.flowergarden.properties.FreshnessInteger;
 import org.junit.*;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,19 +24,16 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Andrew Bandura
  */
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/application-context.xml")
+@ActiveProfiles("test")
 public class FlowerDaoImplTest {
 
-    private static FlowerDao flowerDao;
-    private static BouquetDao bouquetDao;
-
-    @BeforeClass
-    public static void classSetUp(){
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("application-context.xml");
-        bouquetDao = ctx.getBean("testBouquetDao", BouquetDaoImpl.class);
-        flowerDao = ctx.getBean("testFlowerDao", FlowerDaoImpl.class);
-
-    }
-
+    @Autowired
+    private  FlowerDao flowerDao;
+    @Autowired
+    private  BouquetDao bouquetDao;
 
     @Before
     public void setUp(){
@@ -96,7 +94,7 @@ public class FlowerDaoImplTest {
     }
 
     @Test
-    public void readLazyTest() {
+    public void readTest() {
 
         Optional<GeneralFlower> flower = Optional.empty();
         Optional<GeneralFlower> flowerFirst = flowerDao.readFirst();
@@ -175,7 +173,7 @@ public class FlowerDaoImplTest {
     }
 
     @Test
-    public void findAllLazyTest(){
+    public void findAllTest(){
 
         List flowersList =  flowerDao.findAll(FetchMode.LAZY);
 
