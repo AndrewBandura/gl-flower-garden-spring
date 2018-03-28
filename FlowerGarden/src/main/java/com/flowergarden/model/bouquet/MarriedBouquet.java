@@ -9,13 +9,23 @@ import com.flowergarden.model.flowers.Flower;
 import com.flowergarden.model.flowers.GeneralFlower;
 import lombok.Data;
 
+import javax.xml.bind.annotation.*;
 
 @Data
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class MarriedBouquet implements Bouquet<GeneralFlower> {
 
+    @XmlElement
     private int id;
+
+    @XmlElement
     private String name;
+
+    @XmlElement
     private float assemblePrice;
+
+    @XmlElement
     private List<GeneralFlower> flowerList = new ArrayList<>();
 
     public MarriedBouquet() {

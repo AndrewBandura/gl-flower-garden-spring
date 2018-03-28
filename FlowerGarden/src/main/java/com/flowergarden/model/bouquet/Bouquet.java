@@ -3,8 +3,10 @@ package com.flowergarden.model.bouquet;
 
 import com.flowergarden.model.flowers.Flower;
 
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.Collection;
 
+@XmlTransient
 public interface Bouquet<T> {
 
     void setId(int id);
